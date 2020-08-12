@@ -4,7 +4,39 @@
   "author": "Martin Stamm",
   "dependencies": {
     "angular": "^1.8.0",
-    "requirejs": "^2.3.6"
+    "requirejs": "^2.3.6",
+    "@bpmn-io/dmn-migrate": "0.4.3",
+    "@testing-library/jest-dom": "4.2.4",
+    "@testing-library/react": "9.3.2",
+    "@testing-library/user-event": "7.1.2",
+    "angular-animate": "1.8.0",
+    "angular-cookies": "1.8.0",
+    "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend.git#master",
+    "angular-resource": "1.8.0",
+    "angular-route": "1.8.0",
+    "angular-sanitize": "1.8.0",
+    "angular-translate": "2.18.2",
+    "bootstrap": "3.4.1",
+    "bpmn-js": "6.2.1",
+    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations.git#master",
+    "chart.js": "2.8.0",
+    "classnames": "2.2.6",
+    "clipboard": "2.0.4",
+    "cmmn-js": "0.19.2",
+    "dmn-js": "8.0.2",
+    "dmn-js-decision-table": "8.0.2",
+    "dmn-js-drd": "8.0.2",
+    "dmn-js-literal-expression": "8.0.2",
+    "dmn-js-shared": "8.0.2",
+    "fast-xml-parser": "3.16.0",
+    "jquery": "3.5.0",
+    "jquery-ui": "1.12.1",
+    "moment": "2.24.0",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "react-router-dom": "5.1.2",
+    "react-scripts": "3.4.0",
+    "superagent": "5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
@@ -15,6 +47,8 @@
     "@rollup/plugin-replace": "^2.3.3",
     "rollup": "^2.23.0",
     "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-scss": "^2.5.0"
+    "rollup-plugin-scss": "^2.5.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   }
 }

@@ -11,11 +11,12 @@ export default {
     file: "/home/stamm/Develop/camunda-bpm-webapp/ui/cockpit/public/custom/index.js"
   },
   plugins: [
-    resolve(),
-    babel(),
     commonjs({
-      include: "node_modules/**"
-    }),
+        include: "node_modules/**"
+      }),
+    resolve(),
+    babel({exclude: 'src/lib/setup_compiled.js'}),
+
     replace({
       "process.env.NODE_ENV": JSON.stringify("production")
     }),
