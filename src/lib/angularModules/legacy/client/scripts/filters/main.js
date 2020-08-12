@@ -26,4 +26,4 @@ filtersModule.filter("shorten", shorten);
 filtersModule.filter("abbreviateNumber", abbreviateNumber);
 filtersModule.filter("duration", duration);
 
-export default filtersModule;
+module.exports = filtersModule;

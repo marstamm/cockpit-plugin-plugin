@@ -42,4 +42,4 @@ servicesModule.factory("localConf", localConf);
 servicesModule.factory("typeUtils", typeUtils);
 servicesModule.factory("escapeHtml", escapeHtml);
 
-export default servicesModule;
+module.exports = servicesModule;

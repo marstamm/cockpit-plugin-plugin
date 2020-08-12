@@ -2,9 +2,11 @@ import {require, define} from "./lib/require"
 import config from './original-config';
 
 import angular from "angular";
-import setup from "./lib/setup";
+// import setup from "./lib/setup";
 
-// console.log(window.legacyPluginSetup);
+import "./lib/setup_compiled";
+
+console.log(window.legacyPluginSetup.default);
 
 // var angular = window.legacyPluginSetup.angular
 // var setup = window.legacyPluginSetup.setup
@@ -13,9 +15,7 @@ require.config({paths: config.paths});
 
 window.define = define;
 
-
-
-console.log(setup, angular);
+// console.log(setup, angular);
 
 require.config({paths: config.paths});
 
@@ -35,7 +35,12 @@ require(['cats'], function(cats) {
     }];
 
     const module = angular.module('myModule', [cats.name]);
-    setup(cats);
+    // setup(cats);
+    console.log('setup started');
+
+    window.legacyPluginSetup.default(cats);
+
+    console.log('setup ended');
 
     module.controller(
         "myViewController",
@@ -60,14 +65,7 @@ export default {
         console.log(moduleName);
 
         node.innerHTML = `
-        <div ng-controller="myViewController">
-            <div ng-repeat="plugin in plugins"
-                class="deprecate-dashboard-view row"
-                data-plugin-id="{{ plugin.id }}">
-                <view vars="dashboardVars"
-                    provider="plugin"></view>
-            </div>
-        </div>`
+        Is the HTML important?`
         angular.bootstrap(node, [moduleName.name])
     }  
 }

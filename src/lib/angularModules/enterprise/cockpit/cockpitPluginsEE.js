@@ -17,4 +17,4 @@
 
 import angular from "angular";
 
-export default angular.module("ee-stub", []);
+module.exports = angular.module("ee-stub", []);
