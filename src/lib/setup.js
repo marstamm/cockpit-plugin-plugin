@@ -1,6 +1,7 @@
 import angular from "angular";
-import viewsProvider from "./viewsProvider"
-import viewDirective from "./viewDirective"
+import viewsProvider from "./viewsProvider";
+import viewDirective from "./viewDirective";
+import localConf from "./localConf";
 // var camCommonsModule = require( "./angularModules/legacy/camunda-commons-ui/lib");
 // var pluginsModule = require( "./angularModules/legacy/plugins");
 // var services = require( "./angularModules/legacy/client/scripts/services/main");
@@ -9,24 +10,24 @@ import viewDirective from "./viewDirective"
 // var directives = require( "./angularModules/legacy/client/scripts/directives/main");
 // var eePlugins = require( "./angularModules/enterprise/cockpit/cockpitPluginsEE");
 
-
 export default function setup(module) {
-    // module.requires.push(
-    //     camCommonsModule.name,
-    //     dataDepend.name,
-    //     pluginsModule.name,
-    //     services.name,
-    //     resources.name,
-    //     filters.name,
-    //     directives.name,
-    //     eePlugins.name
-    //   );
-    
-    var ngModule = angular.module('cockpit.setup.stuff', []);
+  // module.requires.push(
+  //     camCommonsModule.name,
+  //     dataDepend.name,
+  //     pluginsModule.name,
+  //     services.name,
+  //     resources.name,
+  //     filters.name,
+  //     directives.name,
+  //     eePlugins.name
+  //   );
 
-    viewDirective(ngModule);
-    viewsProvider(ngModule);
+  var ngModule = angular.module("cockpit.setup.stuff", []);
 
-    module.requires.push(ngModule.name);
-    return module;
+  viewDirective(ngModule);
+  viewsProvider(ngModule);
+  ngModule.factory("localConf", localConf);
+
+  module.requires.push(ngModule.name);
+  return module;
 }

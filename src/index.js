@@ -1,73 +1,101 @@
-import {require, define} from "./lib/require"
-import config from './original-config';
+import { require, define } from "./lib/require";
+// import config from './original-config';
 
 import angular from "angular";
 import setup from "./lib/setup";
-
-// console.log(window.legacyPluginSetup);
-
-// var angular = window.legacyPluginSetup.angular
-// var setup = window.legacyPluginSetup.setup
-
-require.config({paths: config.paths});
+import { startLoading, stopLoading, reload } from "./loadingScreen";
 
 window.define = define;
 
+window.loadedPlugins = [];
+let deps;
 
+startLoading();
 
-console.log(setup, angular);
+(async () => {
+  const config = (await import("/custom/config.js")).default;
+  console.log(config);
+  require.config({ paths: config.paths });
 
-require.config({paths: config.paths});
-
-window.define = define;
-
-define('angular', function() {
+  define("angular", function () {
     return angular;
-  }
-);
+  });
 
-let moduleName;
+  require(config.deps, function (..._deps) {
+    deps = _deps;
 
-require(['cats'], function(cats) {
-    var controller = [ '$scope', 'Views', function(scope, views) {
-        console.log(scope, views);
-        scope.plugins = views.getProviders({component: 'cockpit.dashboard'});
-    }];
+    deps.forEach((el) => {
+      setup(el);
+    });
 
-    const module = angular.module('myModule', [cats.name]);
-    setup(cats);
+    bootstrapPlugin("a", document.createElement("div"), 0);
 
-    module.controller(
-        "myViewController",
-        controller
-    );
+    // console.log(window.loadedPlugins);
 
-    moduleName = module;
-    console.log(moduleName);
-    console.log('cats', cats);
-})
+    const loadedPluginJson = JSON.stringify(window.loadedPlugins);
+    const oldLoadedPlugins = localStorage.getItem("loadedPlugins");
 
-require(['angular'], function(angular) {
+    localStorage.setItem("loadedPlugins", JSON.stringify(window.loadedPlugins));
+
+    if (loadedPluginJson != oldLoadedPlugins) {
+      reload();
+    } else {
+      stopLoading();
+    }
+
+    console.log(deps);
+  });
+
+  require(["angular"], function (angular) {
     console.log(angular);
+  });
+})();
+
+function bootstrapPlugin(pluginPoint, node, id) {
+  //   deps;
+
+  var controller = [
+    "$scope",
+    "Views",
+    function (scope, views) {
+      scope.plugin = views.getProviders({ component: pluginPoint })[id];
+    },
+  ];
+
+  const module = angular.module(
+    "myModule",
+    deps.map((el) => el.name)
+  );
+
+  module.controller("myViewController", controller);
+
+  node.innerHTML = `
+  <div ng-controller="myViewController">
+        <view provider="plugin"></view>
+  </div>`;
+  angular.bootstrap(node, [module.name]);
+
+  return module;
+}
+
+const lastPlugins = JSON.parse(localStorage.getItem("loadedPlugins"));
+let counter = {};
+
+let pluginDefs = lastPlugins.map(({ key, definition }) => {
+  if (counter[key]) counter[key]++;
+  else counter[key] = 1;
+
+  return {
+    id: definition.id,
+    pluginPoint: key,
+    priority: definition.priority,
+    label: definition.label,
+    render: (node) => {
+      bootstrapPlugin(key, node, counter[key] - 1);
+    },
+  };
 });
 
-export default {
-    id: "cockpit.cats",
-    pluginPoint: "cockpit.dashboard",
-    priority: 9,
-    label: "Cats!",
-    render: node => {
-        console.log(moduleName);
+console.log("pluginDefs", pluginDefs);
 
-        node.innerHTML = `
-        <div ng-controller="myViewController">
-            <div ng-repeat="plugin in plugins"
-                class="deprecate-dashboard-view row"
-                data-plugin-id="{{ plugin.id }}">
-                <view vars="dashboardVars"
-                    provider="plugin"></view>
-            </div>
-        </div>`
-        angular.bootstrap(node, [moduleName.name])
-    }  
-}
+export default pluginDefs;

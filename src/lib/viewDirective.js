@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-import angular from "angular"
+import angular from "angular";
 // module is passed by the "loader" (main.js)
-export default function(module) {
+export default function (module) {
   module.directive("view", [
     "$q",
     "$http",
     "$templateCache",
     "$compile",
     "$controller",
-    function($q, $http, $templateCache, $compile, $controller) {
+    function ($q, $http, $templateCache, $compile, $controller) {
       return {
         restrict: "ECA",
         terminal: true,
-        link: function(scope, element, attrs) {
-          console.log('view');
+        link: function (scope, element, attrs) {
+          console.log("view");
           var lastScope;
 
           scope.$watch(attrs.provider, update);
 
           function destroyLastScope() {
-            console.log('destroyLastScope');
+            console.log("destroyLastScope");
 
             if (lastScope) {
               lastScope.$destroy();
@@ -57,14 +57,14 @@ export default function(module) {
             var url = viewProvider.url;
             return $http
               .get(url, { cache: $templateCache })
-              .then(function(response) {
+              .then(function (response) {
                 return response.data;
               })
               .catch(angular.noop);
           }
 
           function update() {
-            console.log('update');
+            console.log("update");
 
             var viewProvider = scope.$eval(attrs.provider);
             var viewVars = scope.$eval(attrs.vars) || {};
@@ -75,9 +75,8 @@ export default function(module) {
             }
 
             $q.when(getTemplate(viewProvider)).then(
-
-              function(template) {
-                console.log('template');
+              function (template) {
+                console.log("template");
 
                 element.html(template);
                 destroyLastScope();
@@ -90,19 +89,19 @@ export default function(module) {
 
                 if (viewVars) {
                   if (viewVars.read) {
-                    angular.forEach(viewVars.read, function(e) {
+                    angular.forEach(viewVars.read, function (e) {
                       // fill read vars initially
                       lastScope[e] = scope[e];
 
-                      scope.$watch(e, function(newValue) {
+                      scope.$watch(e, function (newValue) {
                         lastScope[e] = newValue;
                       });
                     });
                   }
 
                   if (viewVars.write) {
-                    angular.forEach(viewVars.write, function(e) {
-                      lastScope.$watch(e, function(newValue) {
+                    angular.forEach(viewVars.write, function (e) {
+                      lastScope.$watch(e, function (newValue) {
                         scope[e] = newValue;
                       });
                     });
@@ -123,15 +122,15 @@ export default function(module) {
                 // $anchorScroll might listen on event...
                 // $anchorScroll();
               },
-              function(error) {
+              function (error) {
                 clearContent();
 
                 throw error;
               }
             );
           }
-        }
+        },
       };
-    }
+    },
   ]);
-};
+}
