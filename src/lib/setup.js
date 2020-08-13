@@ -24,6 +24,7 @@ export default function setup(module) {
     
     var ngModule = angular.module('cockpit.setup.stuff', []);
 
+    
     viewDirective(ngModule);
     viewsProvider(ngModule);
 

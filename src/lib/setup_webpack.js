@@ -18,10 +18,10 @@ export default function setup(module) {
         camCommonsModule.name,
         dataDepend.name,
         pluginsModule.name,
-        services.name,
+        // services.name,
         resources.name,
         filters.name,
-        directives.name,
+        // directives.name,
         // eePlugins.name
       );
     

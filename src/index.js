@@ -2,7 +2,7 @@ import {require, define} from "./lib/require"
 import config from './original-config';
 
 import angular from "angular";
-// import setup from "./lib/setup";
+import setup from "./lib/setup";
 
 import "./lib/setup_compiled";
 
@@ -35,10 +35,10 @@ require(['cats'], function(cats) {
     }];
 
     const module = angular.module('myModule', [cats.name]);
-    // setup(cats);
+    
     console.log('setup started');
-
-    window.legacyPluginSetup.default(cats);
+    setup(cats);
+    // window.legacyPluginSetup.default(cats);
 
     console.log('setup ended');
 
@@ -65,7 +65,13 @@ export default {
         console.log(moduleName);
 
         node.innerHTML = `
-        Is the HTML important?`
+        <div ng-controller="myViewController">
+            <div ng-repeat="plugin in plugins"
+                data-plugin-id="{{ plugin.id }}">
+                <plugin vars="dashboardVars"
+                    provider="plugin"></plugin>
+            </div>
+        </div>`
         angular.bootstrap(node, [moduleName.name])
     }  
 }
