@@ -17,8 +17,11 @@
 
 import angular from "angular";
 import $ from "jquery";
+
+console.log("hello");
+
 // module is passed by the "loader" (main.js)
-export default function(module) {
+export default function (module) {
   // the following lines are gathering the IDs of plugins who should be excluded
   // to exclude a plugin, its key and (optionaly) its id
   module._camPlugins = {};
@@ -26,7 +29,7 @@ export default function(module) {
   var expParts = [];
   var attr = $("base").attr("cam-exclude-plugins") || "";
   if (attr) {
-    angular.forEach(attr.split(","), function(plugin) {
+    angular.forEach(attr.split(","), function (plugin) {
       plugin = plugin.split(":");
       var feature = "*";
       if (plugin.length >= 2 && !!trim(plugin[1])) {
@@ -48,7 +51,7 @@ export default function(module) {
   }
 
   var PluginsProvider = [
-    function() {
+    function () {
       var pluginMap = {};
 
       function addPlugin(plugins, definition) {
@@ -76,7 +79,11 @@ export default function(module) {
         addPlugin(pluginsByKey, definition);
       }
 
-      this.registerPlugin = function(type, key, definition) {
+      this.registerPlugin = function (type, key, definition) {
+        console.log("registerPlugin", type, key, definition);
+
+        window.loadedPlugins.push({ key, definition });
+
         module._camPlugins[key + ":" + definition.id] = false;
 
         // test if the plugin is excluded
@@ -92,13 +99,13 @@ export default function(module) {
 
       this.$get = [
         "$filter",
-        function($filter) {
+        function ($filter) {
           var service = {
-            getAllProviders: function(type) {
+            getAllProviders: function (type) {
               return pluginMap[type] || {};
             },
 
-            getProviders: function(type, options) {
+            getProviders: function (type, options) {
               if (!type) {
                 throw new Error("No type given");
               }
@@ -118,23 +125,25 @@ export default function(module) {
               return providers || [];
             },
 
-            getProvider: function(type, options) {
+            getProvider: function (type, options) {
               var providers = this.getProviders(type, options);
               return (providers || [])[0];
-            }
+            },
           };
 
           return service;
-        }
+        },
       ];
-    }
+    },
   ];
 
   module.provider("Plugins", PluginsProvider);
 
   var ViewsProvider = [
     "PluginsProvider",
-    function(PluginsProvider) {
+    function (PluginsProvider) {
+      console.log("PluginsProvider", PluginsProvider);
+
       /**
        * Registers the given viewProvider for the specified view
        *
@@ -153,7 +162,7 @@ export default function(module) {
        * @param {string} key
        * @param {Object} viewProvider
        */
-      this.registerDefaultView = function(key, viewProvider) {
+      this.registerDefaultView = function (key, viewProvider) {
         // test if the plugin is excluded
         if (excludeExp && excludeExp.test(key + ":" + viewProvider.id)) {
           return;
@@ -161,14 +170,16 @@ export default function(module) {
         PluginsProvider.registerPlugin("view", key, viewProvider);
       };
 
-      this.registerView = function(key, viewProvider) {
+      this.registerView = function (key, viewProvider) {
+        console.log("registerView", plugins, definition);
+
         PluginsProvider.registerPlugin("view", key, viewProvider);
       };
 
       this.$get = [
         // "Uri",
         "Plugins",
-        function( /*Uri,*/ Plugins) {
+        function (/*Uri,*/ Plugins) {
           var initialized = false;
 
           /**
@@ -178,8 +189,8 @@ export default function(module) {
            * @param app the application to resolve plugin references against
            */
           function initializeViews(map) {
-            angular.forEach(map, function(viewProviders) {
-              angular.forEach(viewProviders, function(viewProvider) {
+            angular.forEach(map, function (viewProviders) {
+              angular.forEach(viewProviders, function (viewProvider) {
                 if (viewProvider.url) {
                   viewProvider.url = viewProvider.url;
                 }
@@ -196,29 +207,29 @@ export default function(module) {
           }
 
           var service = {
-            getProviders: function(options) {
+            getProviders: function (options) {
               ensureInitialized();
 
               return Plugins.getProviders("view", options);
             },
 
-            getProvider: function(options) {
+            getProvider: function (options) {
               var viewProviders = this.getProviders(options);
               return (viewProviders || [])[0];
-            }
+            },
           };
 
           return service;
-        }
+        },
       ];
-    }
+    },
   ];
 
   module.provider("Views", ViewsProvider);
 
   var DataProvider = [
     "PluginsProvider",
-    function(PluginsProvider) {
+    function (PluginsProvider) {
       /**
        * Registers the given dataProvider for the specified data
        *
@@ -234,38 +245,38 @@ export default function(module) {
        * @param {string} key
        * @param {Object} dataProvider
        */
-      this.registerData = function(key, dataProvider) {
+      this.registerData = function (key, dataProvider) {
         PluginsProvider.registerPlugin("data", key, dataProvider);
       };
 
       this.$get = [
         "Plugins",
         "$injector",
-        function(Plugins, $injector) {
+        function (Plugins, $injector) {
           var service = {
-            getProviders: function(options) {
+            getProviders: function (options) {
               return Plugins.getProviders("data", options);
             },
 
-            getProvider: function(options) {
+            getProvider: function (options) {
               var dataProviders = this.getProviders(options);
               return (dataProviders || [])[0];
             },
 
-            instantiateProviders: function(key, locals) {
+            instantiateProviders: function (key, locals) {
               var dataProviders = this.getProviders({ component: key });
 
-              angular.forEach(dataProviders, function(dataProvider) {
+              angular.forEach(dataProviders, function (dataProvider) {
                 $injector.instantiate(dataProvider.controller, locals);
               });
-            }
+            },
           };
 
           return service;
-        }
+        },
       ];
-    }
+    },
   ];
 
   module.provider("Data", DataProvider);
-};
+}

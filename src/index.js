@@ -1,77 +1,105 @@
-import {require, define} from "./lib/require"
-import config from './original-config';
+import { require, define } from "./lib/require";
+// import config from './original-config';
 
 import angular from "angular";
 import setup from "./lib/setup";
-
-import "./lib/setup_compiled";
-
-console.log(window.legacyPluginSetup.default);
-
-// var angular = window.legacyPluginSetup.angular
-// var setup = window.legacyPluginSetup.setup
-
-require.config({paths: config.paths});
+import { startLoading, stopLoading, reload } from "./loadingScreen";
 
 window.define = define;
 
-// console.log(setup, angular);
+window.loadedPlugins = [];
+let deps;
 
-require.config({paths: config.paths});
+startLoading();
 
-window.define = define;
-
-define('angular', function() {
-    return angular;
+(async () => {
+  const config = (await import("" + "./config.js")).default.legacyScripts;
+  console.log(config);
+  for (const [key, value] of Object.entries(config.paths)) {
+    if (value.includes("http")) continue;
+    config.paths[key] = "../" + value;
   }
-);
+  require.config({ paths: config.paths });
 
-let moduleName;
+  define("angular", function () {
+    return angular;
+  });
 
-require(['cats'], function(cats) {
-    var controller = [ '$scope', 'Views', function(scope, views) {
-        console.log(scope, views);
-        scope.plugins = views.getProviders({component: 'cockpit.dashboard'});
-    }];
+  require(config.deps, function (..._deps) {
+    deps = _deps;
 
-    const module = angular.module('myModule', [cats.name]);
-    
-    console.log('setup started');
-    setup(cats);
-    // window.legacyPluginSetup.default(cats);
+    deps.forEach((el) => {
+      setup(el);
+    });
 
-    console.log('setup ended');
+    bootstrapPlugin("a", document.createElement("div"), 0);
 
-    module.controller(
-        "myViewController",
-        controller
-    );
+    // console.log(window.loadedPlugins);
 
-    moduleName = module;
-    console.log(moduleName);
-    console.log('cats', cats);
-})
+    const loadedPluginJson = JSON.stringify(window.loadedPlugins);
+    const oldLoadedPlugins = localStorage.getItem("loadedPlugins");
 
-require(['angular'], function(angular) {
+    localStorage.setItem("loadedPlugins", JSON.stringify(window.loadedPlugins));
+
+    if (loadedPluginJson != oldLoadedPlugins) {
+      reload();
+    } else {
+      stopLoading();
+    }
+
+    console.log(deps);
+  });
+
+  require(["angular"], function (angular) {
     console.log(angular);
+  });
+})();
+
+function bootstrapPlugin(pluginPoint, node, id) {
+  //   deps;
+
+  var controller = [
+    "$scope",
+    "Views",
+    function (scope, views) {
+      scope.plugin = views.getProviders({ component: pluginPoint })[id];
+    },
+  ];
+
+  const module = angular.module(
+    "myModule",
+    deps.map((el) => el.name)
+  );
+
+  module.controller("myViewController", controller);
+
+  node.innerHTML = `
+  <div ng-controller="myViewController">
+        <view provider="plugin"></view>
+  </div>`;
+  angular.bootstrap(node, [module.name]);
+
+  return module;
+}
+
+const lastPlugins = JSON.parse(localStorage.getItem("loadedPlugins"));
+let counter = {};
+
+let pluginDefs = lastPlugins.map(({ key, definition }) => {
+  if (counter[key]) counter[key]++;
+  else counter[key] = 1;
+
+  return {
+    id: definition.id,
+    pluginPoint: key,
+    priority: definition.priority,
+    label: definition.label,
+    render: (node) => {
+      bootstrapPlugin(key, node, counter[key] - 1);
+    },
+  };
 });
 
-export default {
-    id: "cockpit.cats",
-    pluginPoint: "cockpit.dashboard",
-    priority: 9,
-    label: "Cats!",
-    render: node => {
-        console.log(moduleName);
+console.log("pluginDefs", pluginDefs);
 
-        node.innerHTML = `
-        <div ng-controller="myViewController">
-            <div ng-repeat="plugin in plugins"
-                data-plugin-id="{{ plugin.id }}">
-                <plugin vars="dashboardVars"
-                    provider="plugin"></plugin>
-            </div>
-        </div>`
-        angular.bootstrap(node, [moduleName.name])
-    }  
-}
+export default pluginDefs;
