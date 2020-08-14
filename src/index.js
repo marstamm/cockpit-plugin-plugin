@@ -13,8 +13,12 @@ let deps;
 startLoading();
 
 (async () => {
-  const config = (await import("/custom/config.js")).default;
+  const config = (await import("" + "./config.js")).default.legacyScripts;
   console.log(config);
+  for (const [key, value] of Object.entries(config.paths)) {
+    if (value.includes("http")) continue;
+    config.paths[key] = "../" + value;
+  }
   require.config({ paths: config.paths });
 
   define("angular", function () {
