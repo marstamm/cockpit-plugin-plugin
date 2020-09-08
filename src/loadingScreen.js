@@ -1,3 +1,5 @@
+import './loadingScreen.scss'
+
 const body = document.querySelector("body");
 
 const loadingScreen = document.createElement("div");
@@ -11,7 +13,6 @@ let lastUrl;
 const startLoading = function () {
   lastUrl = location.href;
   location.hash = "#/loading-plugins";
-  console.log("change hash");
   body.appendChild(loadingScreen);
 };
 
@@ -22,7 +23,7 @@ const reload = function () {
 
 const stopLoading = function () {
   location.href = lastUrl;
-  body.removeChild(loadingScreen);
+  // body.removeChild(loadingScreen);
 };
 
 export { startLoading, stopLoading, reload };
