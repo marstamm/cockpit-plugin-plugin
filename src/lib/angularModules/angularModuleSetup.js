@@ -46,10 +46,8 @@ export default function setup(module) {
     eePlugins.name
   );
 
-  plugins.forEach(plugin => {
-    const pluginDirectiveUID = Math.random()
-      .toString(36)
-      .substring(2);
+  plugins.forEach((plugin) => {
+    const pluginDirectiveUID = Math.random().toString(36).substring(2);
 
     // overlay function for diagram overlay plugins
     plugin.overlay = [
@@ -62,13 +60,13 @@ export default function setup(module) {
           scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
         );
         scope.$on("$destroy", plugin.unmount);
-      }
+      },
     ];
 
     module.directive("pluginBridge" + pluginDirectiveUID, [
-      function() {
+      function () {
         return {
-          link: function(scope, element) {
+          link: function (scope, element) {
             const isolatedContainer = document.createElement("div");
             plugin.render(
               isolatedContainer,
@@ -78,27 +76,27 @@ export default function setup(module) {
 
             element[0].appendChild(isolatedContainer);
             scope.$on("$destroy", plugin.unmount);
-          }
+          },
         };
-      }
+      },
     ]);
 
     module.config([
       "ViewsProvider",
-      function(ViewsProvider) {
+      function (ViewsProvider) {
         ViewsProvider.registerDefaultView(plugin.pluginPoint, {
           ...plugin,
-          template: `<div plugin-bridge${pluginDirectiveUID} />`
+          template: `<div plugin-bridge${pluginDirectiveUID} />`,
         });
-      }
+      },
     ]);
   });
 
   module.config([
     "$httpProvider",
-    function($httpProvider) {
+    function ($httpProvider) {
       $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
-    }
+    },
   ]);
 
   module.provider(
@@ -111,29 +109,29 @@ export default function setup(module) {
 
   module.config([
     "$translateProvider",
-    function($translateProvider) {
+    function ($translateProvider) {
       // add translation table
       $translateProvider.translations("en", locale).preferredLanguage("en");
       $translateProvider.useSanitizeValueStrategy("escapeParameters");
-    }
+    },
   ]);
 
   module.config([
     "camDateFormatProvider",
-    function(camDateFormatProvider) {
+    function (camDateFormatProvider) {
       var formats = {
         monthName: "MMMM",
         day: "DD",
         abbr: "lll",
         normal: "YYYY-MM-DD[T]HH:mm:ss", // yyyy-MM-dd'T'HH:mm:ss => 2013-01-23T14:42:45
         long: "LLLL",
-        short: "LL"
+        short: "LL",
       };
 
       for (var f in formats) {
         camDateFormatProvider.setDateFormat(formats[f], f);
       }
-    }
+    },
   ]);
 
   module.config([
@@ -144,7 +142,7 @@ export default function setup(module) {
     "$locationProvider",
     "$animateProvider",
     "$qProvider",
-    function(
+    function (
       $routeProvider,
       UriProvider,
       $modalProvider,
@@ -170,7 +168,7 @@ export default function setup(module) {
 
       UriProvider.replace(":engine", [
         "$window",
-        function($window) {
+        function ($window) {
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/cockpit\/([\w-]+)(|\/)/);
@@ -179,19 +177,19 @@ export default function setup(module) {
           } else {
             throw new Error("no process engine selected");
           }
-        }
+        },
       ]);
 
       $modalProvider.options = {
         animation: true,
         backdrop: true,
-        keyboard: true
+        keyboard: true,
       };
 
       $tooltipProvider.options({
         animation: true,
         popupDelay: 100,
-        appendToBody: true
+        appendToBody: true,
       });
 
       $locationProvider.hashPrefix("");
@@ -199,7 +197,7 @@ export default function setup(module) {
       $animateProvider.classNameFilter(/angular-animate/);
 
       $qProvider.errorOnUnhandledRejections(false);
-    }
+    },
   ]);
 }
 

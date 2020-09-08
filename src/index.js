@@ -2,13 +2,15 @@ import { require, define } from "./lib/require";
 // import config from './original-config';
 
 import angular from "angular";
-import setup from "./lib/setup";
+import "./lib/setup_compiled";
 import { startLoading, stopLoading, reload } from "./loadingScreen";
 
 window.define = define;
 
 window.loadedPlugins = [];
 let deps;
+
+const setup = window.legacyPluginSetup.default;
 
 startLoading();
 
@@ -47,7 +49,7 @@ startLoading();
       stopLoading();
     }
 
-    console.log(deps);
+    console.log("you are here", deps, window.loadedPlugins);
   });
 
   require(["angular"], function (angular) {
