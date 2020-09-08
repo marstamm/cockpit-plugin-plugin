@@ -14,7 +14,6 @@ startLoading();
 
 (async () => {
   const config = (await import("" + "./config.js")).default.legacyScripts;
-  console.log(config);
   for (const [key, value] of Object.entries(config.paths)) {
     if (value.includes("http")) continue;
     config.paths[key] = "../" + value;
@@ -34,8 +33,6 @@ startLoading();
 
     bootstrapPlugin("a", document.createElement("div"), 0);
 
-    // console.log(window.loadedPlugins);
-
     const loadedPluginJson = JSON.stringify(window.loadedPlugins);
     const oldLoadedPlugins = localStorage.getItem("loadedPlugins");
 
@@ -46,12 +43,6 @@ startLoading();
     } else {
       stopLoading();
     }
-
-    console.log(deps);
-  });
-
-  require(["angular"], function (angular) {
-    console.log(angular);
   });
 })();
 
