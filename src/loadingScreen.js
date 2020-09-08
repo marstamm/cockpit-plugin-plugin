@@ -23,7 +23,7 @@ const reload = function () {
 
 const stopLoading = function () {
   location.href = lastUrl;
-  // body.removeChild(loadingScreen);
+  body.removeChild(loadingScreen);
 };
 
 export { startLoading, stopLoading, reload };
