@@ -3,6 +3,8 @@ The Plugin to run Camunda 7.13 Plugins in 7.14.
 Tested on Camunda-BPM 7.14.0-alpha2
 
 ## Building the Project
+You can also download a pre-compiled version [here](https://github.com/marstamm/cockpit-plugin-plugin/releases/). Please keep in mind that the latest release could still be outdated. 
+
 Install the project with `npm i` and build the plugin with `npm run build`. Your plugin will be created in `dist/plugin.js`.
 
 ## Integrate into Camunda Webapp
